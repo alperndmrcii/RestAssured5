@@ -76,4 +76,19 @@ public class ZippoTest {
 
                 ;
     }
+    @Test
+    public void combiningTest(){
+        given()
+
+                .when()
+                .get("http://api.zippopotam.us/us/90210")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("places",hasSize(1))
+                .body("places.state",hasItem("California"))
+                .body("places[0].'place name'",equalTo("Beverly Hills"))
+                ;
+    }
 }
