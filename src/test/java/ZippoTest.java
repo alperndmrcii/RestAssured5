@@ -91,4 +91,21 @@ public class ZippoTest {
                 .body("places[0].'place name'",equalTo("Beverly Hills"))
                 ;
     }
+    @Test
+    public void pathParamTest(){
+        given()
+                .pathParam("ulke","us")
+                .pathParam("postakod",90210)
+                .log().uri() // request link
+
+
+                .when()
+                .get("http://api.zippopotam.us/{ulke}/{postakod}")
+
+
+                .then()
+                .statusCode(200)
+
+                ;
+    }
 }
