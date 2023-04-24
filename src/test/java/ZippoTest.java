@@ -1,6 +1,7 @@
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
-
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
 import static io.restassured.RestAssured.*;
 
 public class ZippoTest {
@@ -30,6 +31,19 @@ public class ZippoTest {
                         .log().body() // dönen body json datası log.all (her şeyi gösterir)
                         .statusCode(200) // dönüş kodu 200 mü ?
                         .contentType(ContentType.JSON) // dönen sonuc json mı ?
+                        .body("country",equalTo("United States"))
+                ;
+    }
+    @Test
+    public void StateTest(){
+        given()
+                .when().
+        get("http://api.zippopotam.us/us/90210")
+                .then()
+                //.log().body()
+                //.statusCode(200) // dönüş kodu 200 mü ?
+                //.contentType(ContentType.JSON) // dönen sonuc json mı ?
+                .body("places[0].state",equalTo("California"))
                 ;
     }
 
