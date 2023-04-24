@@ -121,7 +121,25 @@ public class ZippoTest {
 
                 .then()
                 .statusCode(200)
+                .log().body()
 
         ;
+    }
+    @Test
+    public void queryParamTest2() {
+        // https://gorest.co.in/public/v1/users?page=3
+        // bu linkteki 1 den 10 kadar sayfaları çağırdığınızda response daki donen page degerlerinin
+        // çağrılan page nosu ile aynı olup olmadığını kontrol ediniz.
+
+        for (int i = 1; i <10 ; i++) {
+            given()
+                    .param("page",i)
+                    .log().uri()
+                    .when()
+                    .get("https://gorest.co.in/public/v1/users")
+                    .then()
+                    .statusCode(200)
+                    .body("meta.pagination.page",equalTo(i));
+        }
     }
 }
