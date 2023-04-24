@@ -1,5 +1,6 @@
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
+
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import static io.restassured.RestAssured.*;
@@ -7,7 +8,7 @@ import static io.restassured.RestAssured.*;
 public class ZippoTest {
     @Test
     public void Test() {
-                given()
+        given()
                 // Hazırlık işlemleri : (token,send body, parameters)
 
                 .when()
@@ -22,29 +23,43 @@ public class ZippoTest {
     @Test
     public void StatusCodeTest() {
 
-                given()
+        given()
 
                 .when()
-                        .get("http://api.zippopotam.us/us/90210")
+                .get("http://api.zippopotam.us/us/90210")
 
                 .then()
-                        .log().body() // dönen body json datası log.all (her şeyi gösterir)
-                        .statusCode(200) // dönüş kodu 200 mü ?
-                        .contentType(ContentType.JSON) // dönen sonuc json mı ?
-                        .body("country",equalTo("United States"))
-                ;
+                .log().body() // dönen body json datası log.all (her şeyi gösterir)
+                .statusCode(200) // dönüş kodu 200 mü ?
+                .contentType(ContentType.JSON) // dönen sonuc json mı ?
+                .body("country", equalTo("United States"))
+        ;
     }
+
     @Test
-    public void StateTest(){
+    public void StateTest() {
         given()
                 .when().
-        get("http://api.zippopotam.us/us/90210")
+                get("http://api.zippopotam.us/us/90210")
                 .then()
                 //.log().body()
                 //.statusCode(200) // dönüş kodu 200 mü ?
                 //.contentType(ContentType.JSON) // dönen sonuc json mı ?
-                .body("places[0].state",equalTo("California"))
-                ;
+                .body("places[0].state", equalTo("California"))
+        ;
     }
 
+    @Test
+    public void checkHasItemy() {
+        given()
+
+                .when()
+                .get("http://api.zippopotam.us/tr/01000")
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("places.'place name'", hasItem("Dörtağaç Köyü"))
+
+                ;
+    }
 }
