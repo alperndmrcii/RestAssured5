@@ -108,4 +108,20 @@ public class ZippoTest {
 
                 ;
     }
+    @Test
+    public void queryParamTest(){
+        given()
+                .param("page",1)
+                .log().uri() // request link
+
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+
+
+                .then()
+                .statusCode(200)
+
+        ;
+    }
 }
