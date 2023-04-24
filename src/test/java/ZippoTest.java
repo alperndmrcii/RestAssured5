@@ -1,3 +1,4 @@
+import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.*;
@@ -28,6 +29,7 @@ public class ZippoTest {
                 .then()
                         .log().body() // dönen body json datası log.all (her şeyi gösterir)
                         .statusCode(200) // dönüş kodu 200 mü ?
+                        .contentType(ContentType.JSON) // dönen sonuc json mı ?
                 ;
     }
 
