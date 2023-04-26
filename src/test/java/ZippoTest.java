@@ -1,3 +1,5 @@
+import Model.Location;
+import Model.Place;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
@@ -238,32 +240,32 @@ public class ZippoTest {
     public void extractingJsonPath3() {
         // https://gorest.co.in/public/v1/users  dönen değerdeki datadaki bütün id bilgilerini yazdırınız.
 
-      List<Integer> idler =
-              given()
+        List<Integer> idler =
+                given()
 
-                .when()
-                .get("/users")
+                        .when()
+                        .get("/users")
 
-                .then()
-              .extract().path("data.id")
-        ;
+                        .then()
+                        .extract().path("data.id");
         System.out.println("idler = " + idler);
     }
+
     @Test
     public void extractingJsonPath4() {
         // https://gorest.co.in/public/v1/users  dönen değerdeki datadaki bütün name bilgilerini yazdırınız.
-        List<String> names= given()
+        List<String> names = given()
 
 
                 .when()
                 .get("/users")
 
                 .then()
-                .extract().path("data.name")
-        ;
+                .extract().path("data.name");
         System.out.println("names = " + names);
 
     }
+
     @Test
     public void extractingJsonPathResponsAll() {
         // https://gorest.co.in/public/v1/users  dönen değerdeki bütün name lei yazdırınız.
@@ -280,9 +282,9 @@ public class ZippoTest {
                         .extract().response(); // dönen tüm datayı verir.
         ;
 
-        List<Integer> idler= donenData.path("data.id");
-        List<String> names= donenData.path("data.name");
-        int limit= donenData.path("meta.pagination.limit");
+        List<Integer> idler = donenData.path("data.id");
+        List<String> names = donenData.path("data.name");
+        int limit = donenData.path("meta.pagination.limit");
 
         System.out.println("idler = " + idler);
         System.out.println("names = " + names);
@@ -291,5 +293,31 @@ public class ZippoTest {
         Assert.assertTrue(names.contains("Sanjay Mukhopadhyay"));
         Assert.assertTrue(idler.contains(1203758));
         Assert.assertEquals(limit, 10, "test sonucu hatalı");
+    }
+
+    @Test
+    public void extractJsonAll() {
+
+        Location locationNesnesi =
+                given()
+
+                        .when()
+                        .get("http://api.zippopotam.us/us/90210")
+
+                        .then()
+                        //.log().body()
+                        .extract().body().as(Location.class);
+
+
+        System.out.println("locationNesnesi = "
+                + locationNesnesi.getCountry());
+
+
+        for (Place p:locationNesnesi.getPlaces())
+            System.out.println("p = " + p);
+
+
+        System.out.println("locationNesnesi.getPlaces().get(0).getPlacename() = "
+                + locationNesnesi.getPlaces().get(0).getPlacename());
     }
 }
