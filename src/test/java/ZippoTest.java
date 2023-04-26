@@ -160,6 +160,8 @@ public class ZippoTest {
     @BeforeClass
     public void Setup()
     {
+        baseURI = "https://gorest.co.in/public/v1";
+
         requestSpec=new RequestSpecBuilder()
                 .log(LogDetail.URI)
                 .setContentType(ContentType.JSON)
