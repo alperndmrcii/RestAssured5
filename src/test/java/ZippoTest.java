@@ -1,4 +1,11 @@
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.*;
@@ -59,11 +66,11 @@ public class ZippoTest {
                 .log().body()
                 .statusCode(200)
                 .body("places.'place name'", hasItem("Dörtağaç Köyü"))
-                ;
+        ;
     }
 
     @Test
-    public void bodyArrayHasSizeTest(){
+    public void bodyArrayHasSizeTest() {
         given()
 
                 .when()
@@ -72,12 +79,13 @@ public class ZippoTest {
                 .then()
                 .log().body()
                 .statusCode(200)
-                .body("places",hasSize(1))
+                .body("places", hasSize(1))
 
-                ;
+        ;
     }
+
     @Test
-    public void combiningTest(){
+    public void combiningTest() {
         given()
 
                 .when()
@@ -86,16 +94,17 @@ public class ZippoTest {
                 .then()
                 .log().body()
                 .statusCode(200)
-                .body("places",hasSize(1))
-                .body("places.state",hasItem("California"))
-                .body("places[0].'place name'",equalTo("Beverly Hills"))
-                ;
+                .body("places", hasSize(1))
+                .body("places.state", hasItem("California"))
+                .body("places[0].'place name'", equalTo("Beverly Hills"))
+        ;
     }
+
     @Test
-    public void pathParamTest(){
+    public void pathParamTest() {
         given()
-                .pathParam("ulke","us")
-                .pathParam("postakod",90210)
+                .pathParam("ulke", "us")
+                .pathParam("postakod", 90210)
                 .log().uri() // request link
 
 
@@ -106,12 +115,13 @@ public class ZippoTest {
                 .then()
                 .statusCode(200)
 
-                ;
+        ;
     }
+
     @Test
-    public void queryParamTest(){
+    public void queryParamTest() {
         given()
-                .param("page",1)
+                .param("page", 1)
                 .log().uri() // request link
 
 
@@ -125,21 +135,60 @@ public class ZippoTest {
 
         ;
     }
+
     @Test
     public void queryParamTest2() {
         // https://gorest.co.in/public/v1/users?page=3
         // bu linkteki 1 den 10 kadar sayfaları çağırdığınızda response daki donen page degerlerinin
         // çağrılan page nosu ile aynı olup olmadığını kontrol ediniz.
 
-        for (int i = 1; i <10 ; i++) {
+        for (int i = 1; i < 10; i++) {
             given()
-                    .param("page",i)
+                    .param("page", i)
                     .log().uri()
                     .when()
                     .get("https://gorest.co.in/public/v1/users")
                     .then()
                     .statusCode(200)
-                    .body("meta.pagination.page",equalTo(i));
+                    .body("meta.pagination.page", equalTo(i));
         }
     }
+
+    RequestSpecification requestSpec;
+    ResponseSpecification responseSpec;
+
+    @BeforeClass
+    public void Setup()
+    {
+        requestSpec=new RequestSpecBuilder()
+                .log(LogDetail.URI)
+                .setContentType(ContentType.JSON)
+                .build();
+
+        responseSpec=new ResponseSpecBuilder()
+                .expectContentType(ContentType.JSON)
+                .expectStatusCode(200)
+                .log(LogDetail.BODY)
+                .build();
+
+    }
+
+
+    @Test
+    public void queryParamTest1() {
+        given()
+                .param("page", 1)
+                .spec(requestSpec)
+
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+
+
+                .then()
+                .spec(responseSpec)
+        ;
+    }
+
+
 }
