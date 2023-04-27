@@ -1,7 +1,11 @@
 package GoRest;
 
 import com.github.javafaker.Faker;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import org.apache.http.client.methods.RequestBuilder;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -14,7 +18,17 @@ public class GoRestUsersTests {
     Faker randomUretici = new Faker();
     int userID;
 
-    @Test
+    RequestSpecification  requestSpecification;
+    @BeforeClass
+    public void setup(){
+        requestSpecification=new RequestSpecBuilder()
+                .addHeader("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
+                .setContentType(ContentType.JSON)
+                .build();
+
+    }
+
+    @Test(enabled = false)
     public void CreateUserJson() {
         // https://gorest.co.in/public/v2/users
         //  {"name":"{{$randomFullName}}", "gender":"male", "email":"{{$randomEmail}}", "status":"active"}
@@ -25,8 +39,7 @@ public class GoRestUsersTests {
 
         userID =
                 given()
-                        .header("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
-                        .contentType(ContentType.JSON) // gönderilecek data JSON
+                        .spec(requestSpecification)
                         .body("{\"name\":\"" + rndFullname + "\", \"gender\":\"male\", \"email\":\"" + rndEmail + "\", \"status\":\"active\"}")
                         //.log().uri()
                         //.log().body()
@@ -42,10 +55,10 @@ public class GoRestUsersTests {
 
     }
 
-    @Test(dependsOnMethods = "CreateUser")
+    @Test(dependsOnMethods = "CreateUserMap")
     public void GetUserByID() {
         given()
-                .header("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
+                .spec(requestSpecification)
 
                 .when()
                 .get("https://gorest.co.in/public/v2/users/"+userID)
@@ -66,15 +79,14 @@ public class GoRestUsersTests {
         String rndFullname = randomUretici.name().fullName();
         String rndEmail = randomUretici.internet().emailAddress();
 
-        Map<String,String> newUser=new HashMap<>();
+        Map<String,Object> newUser=new HashMap<>();
         newUser.put("name",rndFullname);
         newUser.put("gender","male");
         newUser.put("email",rndEmail);
         newUser.put("status","active");
         userID =
                 given()
-                        .header("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
-                        .contentType(ContentType.JSON) // gönderilecek data JSON
+                        .spec(requestSpecification)
                         .body(newUser)
                         //.log().uri()
                         //.log().body()
@@ -89,7 +101,7 @@ public class GoRestUsersTests {
         ;
 
     }
-    @Test
+    @Test(enabled = false)
     public void CreateUserClass() {
 
         String rndFullname = randomUretici.name().fullName();
@@ -101,8 +113,7 @@ public class GoRestUsersTests {
         newUser.status="active";
         userID =
                 given()
-                        .header("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
-                        .contentType(ContentType.JSON) // gönderilecek data JSON
+                        .spec(requestSpecification)
                         .body(newUser)
                         //.log().uri()
                         //.log().body()
@@ -117,8 +128,25 @@ public class GoRestUsersTests {
         ;
     }
 
-    @Test
+    @Test(dependsOnMethods = "GetUserByID")
     public void UpdateUser() {
+
+        Map<String,Object> updateUser=new HashMap<>();
+        updateUser.put("name","Alperen Demirci");
+
+        given()
+                .spec(requestSpecification)
+                .body(updateUser)
+
+                .when()
+                .put("https://gorest.co.in/public/v2/users"+userID)
+
+                .then()
+                .statusCode(200)
+                .body("id",equalTo(userID))
+                .body("name",equalTo("Alperen Demirci"))
+
+        ;
 
     }
 
