@@ -21,11 +21,14 @@ public class GoRestUsersTests {
     RequestSpecification  requestSpecification;
     @BeforeClass
     public void setup(){
+        baseURI="https://gorest.co.in/public/v2/users/";
+        //baseURI ="https://test.gorest.co.in/public/v2/users/";
+
         requestSpecification=new RequestSpecBuilder()
                 .addHeader("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
                 .setContentType(ContentType.JSON)
+                .setBaseUri(baseURI)
                 .build();
-
     }
 
     @Test(enabled = false)
@@ -44,7 +47,7 @@ public class GoRestUsersTests {
                         //.log().uri()
                         //.log().body()
                         .when()
-                        .post("https://gorest.co.in/public/v2/users")
+                        .post(baseURI)
 
                         .then()
                         .log().body()
@@ -61,7 +64,7 @@ public class GoRestUsersTests {
                 .spec(requestSpecification)
 
                 .when()
-                .get("https://gorest.co.in/public/v2/users/"+userID)
+                .get(baseURI+userID)
 
                 .then()
                 .log().body()
@@ -150,8 +153,9 @@ public class GoRestUsersTests {
 
     }
 
-    @Test
+    @Test(dependsOnMethods = "UpdateUser")
     public void DeleteUser() {
+
 
     }
 
