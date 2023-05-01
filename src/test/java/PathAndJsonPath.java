@@ -57,9 +57,37 @@ public class PathAndJsonPath {
         System.out.println("idPath = " + idPath);
         System.out.println("idJsonPath = " + idJsonPath);
 
-        User[] userPath = response.as(User[].class);
-                 List<User> userJsonPath =  response.jsonPath().getList("",User.class);
+        User[] userPath = response.as(User[].class); // as nesne dönüşümünde (POJO) dizi destekli
+        List<User> userJsonPath = response.jsonPath().getList("", User.class); // JsonPath ise list olarak verebiliyor
         System.out.println("userPath = " + Arrays.toString(userPath));
         System.out.println("userJsonPath = " + userJsonPath);
     }
+
+    @Test
+    public void getUsersV1() {
+        Response body=
+        given()
+
+                .when()
+                .get("https://gorest.co.in/public/v1/users")
+
+                .then()
+               // .log().body()
+                .extract().response()
+        ;
+        List<User>dataUsers=body.jsonPath().getList("data", User.class);
+        //Jsonpath bir response içindeki bir parçayı nesneye dönüştürebilir.
+        System.out.println("dataUsers = " + dataUsers);
+        // Daha önceki örneklerde (as) Clas dönüşümleri için tüm yapıya karşılık gelen
+        // gereken tüm classları yazarak dönüştürüp istediğimiz elemanlara ulaşıyorduk.
+
+        // Burada ise(JsonPath) aradaki bir veriyi clasa dönüştürerek bir list olarak almamıza
+        // imkan veren JSONPATH i kullandık.Böylece tek class ile veri alınmış oldu
+        // diğer class lara gerek kalmadan
+
+        // path : class veya tip dönüşümüne imkan veremeyen direk veriyi verir. List<String> gibi
+        // jsonPath : class dönüşümüne ve tip dönüşümüne izin vererek , veriyi istediğimiz formatta verir.
+
+    }
+
 }
