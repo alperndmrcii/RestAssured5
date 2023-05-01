@@ -18,16 +18,16 @@ public class GoRestUsersTests {
     Faker randomUretici = new Faker();
     int userID;
 
-    RequestSpecification  requestSpecification;
+    RequestSpecification requestSpecification;
+
     @BeforeClass
-    public void setup(){
-        baseURI="https://gorest.co.in/public/v2/users/";
+    public void setup() {
+        baseURI = "https://gorest.co.in/public/v2/users/";
         //baseURI ="https://test.gorest.co.in/public/v2/users/";
 
-        requestSpecification=new RequestSpecBuilder()
+        requestSpecification = new RequestSpecBuilder()
                 .addHeader("Authorization", "Bearer a3595aa2d2f40a1af2fdc5aff7d7b5e5f6564955bcebc5c21ab3aba805dff801")
                 .setContentType(ContentType.JSON)
-                .setBaseUri(baseURI)
                 .build();
     }
 
@@ -64,29 +64,30 @@ public class GoRestUsersTests {
                 .spec(requestSpecification)
 
                 .when()
-                .get(baseURI+userID)
+                .get(baseURI + userID)
 
                 .then()
                 .log().body()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("id",equalTo(userID))
+                .body("id", equalTo(userID))
 
 
-                ;
+        ;
 
     }
+
     @Test
     public void CreateUserMap() {
 
         String rndFullname = randomUretici.name().fullName();
         String rndEmail = randomUretici.internet().emailAddress();
 
-        Map<String,Object> newUser=new HashMap<>();
-        newUser.put("name",rndFullname);
-        newUser.put("gender","male");
-        newUser.put("email",rndEmail);
-        newUser.put("status","active");
+        Map<String, Object> newUser = new HashMap<>();
+        newUser.put("name", rndFullname);
+        newUser.put("gender", "male");
+        newUser.put("email", rndEmail);
+        newUser.put("status", "active");
         userID =
                 given()
                         .spec(requestSpecification)
@@ -104,16 +105,17 @@ public class GoRestUsersTests {
         ;
 
     }
+
     @Test(enabled = false)
     public void CreateUserClass() {
 
         String rndFullname = randomUretici.name().fullName();
         String rndEmail = randomUretici.internet().emailAddress();
-        User newUser=new User();
-        newUser.name=rndFullname;
-        newUser.gender="male";
-        newUser.email=rndEmail;
-        newUser.status="active";
+        User newUser = new User();
+        newUser.name = rndFullname;
+        newUser.gender = "male";
+        newUser.email = rndEmail;
+        newUser.status = "active";
         userID =
                 given()
                         .spec(requestSpecification)
@@ -133,34 +135,51 @@ public class GoRestUsersTests {
 
     @Test(dependsOnMethods = "GetUserByID")
     public void UpdateUser() {
-
-        Map<String,Object> updateUser=new HashMap<>();
-        updateUser.put("name","Alperen Demirci");
+        Map<String, String> updateUser = new HashMap<>();
+        updateUser.put("name", "Alperen Demirci");
 
         given()
                 .spec(requestSpecification)
                 .body(updateUser)
+                .log().uri()
 
                 .when()
-                .put("https://gorest.co.in/public/v2/users"+userID)
+                .put("" + userID)
 
                 .then()
+                .log().body()
                 .statusCode(200)
-                .body("id",equalTo(userID))
-                .body("name",equalTo("Alperen Demirci"))
-
+                .body("id", equalTo(userID))
+                .body("name", equalTo("Alperen Demirci"))
         ;
 
     }
 
     @Test(dependsOnMethods = "UpdateUser")
     public void DeleteUser() {
+        given()
+                .spec(requestSpecification)
+                .when()
+                .delete(""+userID)
 
+                .then()
+                .log().all()
+                .statusCode(204)
+        ;
 
     }
 
-    @Test
+    @Test(dependsOnMethods = "DeleteUser")
     public void DeleteUserNegative() {
+        given()
+                .spec(requestSpecification)
+                .when()
+                .delete(""+userID)
+
+                .then()
+                .log().all()
+                .statusCode(404)
+        ;
 
     }
 }
