@@ -94,31 +94,55 @@ public class CountryTest {
     @Test(dependsOnMethods = "CreateCountryNegative")
     public void UpdateCountry() {
 
+        Map<String,String> country=new HashMap<>();
+        country.put("id",CountryID);
+
+        CountryName="Alperen ülkesi"+faker.number().digits(7);
+        country.put("name",CountryName);
+        country.put("code",faker.address().countryCode()+faker.number().digits(5));
+
         given()
+                .spec(reqSpec)
+                .body(country) // giden body
+                //.log().body() // giden body yi log olarak göster
+
                 .when()
+                .put("/school-service/api/countries")
 
                 .then()
+                .log().body() // gelen body yi log olarak göster
+                .statusCode(200)
+                .body("name", equalTo(CountryName))
         ;
     }
 
     @Test(dependsOnMethods = "UpdateCountry")
     public void DeleteCountry() {
-
         given()
+                .spec(reqSpec)
+                .pathParam("CountryID",CountryID)
                 .when()
-
+                .delete("/school-service/api/countries/{CountryID}")
                 .then()
+                .log().body()
+                .statusCode(200)
         ;
+
     }
 
     @Test(dependsOnMethods = "DeleteCountry")
     public void DeleteCountryNegative() {
-
         given()
+                .spec(reqSpec)
+                .pathParam("CountryID",CountryID)
                 .when()
-
+                .delete("/school-service/api/countries/{CountryID}")
                 .then()
+                .log().body()
+                .statusCode(400)
+                .body("message",equalTo("Country not found"))
         ;
+
     }
 
 }
