@@ -1,9 +1,12 @@
 import GoRest.User;
+import Model.Location;
+import Model.Place;
 import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
@@ -65,17 +68,16 @@ public class PathAndJsonPath {
 
     @Test
     public void getUsersV1() {
-        Response body=
-        given()
+        Response body =
+                given()
 
-                .when()
-                .get("https://gorest.co.in/public/v1/users")
+                        .when()
+                        .get("https://gorest.co.in/public/v1/users")
 
-                .then()
-               // .log().body()
-                .extract().response()
-        ;
-        List<User>dataUsers=body.jsonPath().getList("data", User.class);
+                        .then()
+                        // .log().body()
+                        .extract().response();
+        List<User> dataUsers = body.jsonPath().getList("data", User.class);
         //Jsonpath bir response içindeki bir parçayı nesneye dönüştürebilir.
         System.out.println("dataUsers = " + dataUsers);
         // Daha önceki örneklerde (as) Clas dönüşümleri için tüm yapıya karşılık gelen
@@ -88,6 +90,24 @@ public class PathAndJsonPath {
         // path : class veya tip dönüşümüne imkan veremeyen direk veriyi verir. List<String> gibi
         // jsonPath : class dönüşümüne ve tip dönüşümüne izin vererek , veriyi istediğimiz formatta verir.
 
+    }
+
+    @Test
+    public void getZipCode() {
+        Response response= given()
+
+                .when()
+                .get("http://api.zippopotam.us/us/90210")
+
+                .then()
+                //.log().body()
+                .extract().response()
+        ;
+       Location locPathAs=response.as(Location.class); // bütün classları yazmak zorunda kalıyorsun
+       System.out.println("locPathAs.getPlaces() = " + locPathAs.getPlaces());
+
+        List<Place> places=response.jsonPath().getList("places", Place.class); // Burada ise nokta atısı istediğimi aldım
+        System.out.println("places = " + places);
     }
 
 }
