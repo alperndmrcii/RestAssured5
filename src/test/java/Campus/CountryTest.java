@@ -15,8 +15,10 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
 public class CountryTest {
-
+    Faker faker = new Faker();
     String CountryID;
+    String CountryName;
+
     RequestSpecification reqSpec;
 
     @BeforeClass
@@ -34,7 +36,7 @@ public class CountryTest {
                         .post("/auth/login")
 
                         .then()
-                      //  .log().all()
+                        //  .log().all()
                         .statusCode(200)
                         .extract().response().getDetailedCookies();
         reqSpec = new RequestSpecBuilder()
@@ -45,13 +47,15 @@ public class CountryTest {
 
     @Test
     public void CreateCountry() {
-        Faker faker=new Faker();
 
 
         Map<String, String> country = new HashMap<>();
-        country.put("name",faker.address().country());
-        country.put("code",faker.address().countryCode());
-       CountryID=  given()
+        CountryName = faker.address().country() + faker.number().digits(5);
+        country.put("name", CountryName);
+        country.put("code", faker.address().countryCode() + faker.number().digits(5));
+
+
+        CountryID = given()
                 .spec(reqSpec)
                 .body(country)
                 .log().body()
@@ -68,12 +72,23 @@ public class CountryTest {
 
     @Test(dependsOnMethods = "CreateCountry")
     public void CreateCountryNegative() {
-
+        Map<String, String> country = new HashMap<>();
+        country.put("name", CountryName);
+        country.put("code", faker.address().countryCode() + faker.number().digits(5));
         given()
+                .spec(reqSpec)
+                .body(country)
+                .log().body()
                 .when()
+                .post("/school-service/api/countries")
 
                 .then()
+                .log().body()
+                .statusCode(400)
+                .body("message",containsString("already"))
         ;
+
+
     }
 
     @Test(dependsOnMethods = "CreateCountryNegative")
