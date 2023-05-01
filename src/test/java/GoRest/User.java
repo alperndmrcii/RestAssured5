@@ -4,6 +4,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class User {
+  @Override
+  public String toString() {
+    return "User{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", gender='" + gender + '\'' +
+            ", email='" + email + '\'' +
+            ", status='" + status + '\'' +
+            '}';
+  }
+
+  int id;
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
   String name;
   String gender;
   String email;
