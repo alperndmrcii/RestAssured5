@@ -121,4 +121,20 @@ public class BankAccountTest {
         ;
 
     }
+    @Test(dependsOnMethods = "EditBankAccount")
+    public void DeleteBankAccount(){
+        given()
+                .spec(reqSpec)
+                .pathParam("BankAccountID",BankAccountID)
+
+                .when()
+                .delete("/school-service/api/bank-accounts/{BankAccountID}")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+
+
+        ;
+    }
 }
