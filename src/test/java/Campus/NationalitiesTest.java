@@ -14,17 +14,16 @@ import java.util.Map;
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-public class CountryTest {
+public class NationalitiesTest {
     Faker faker = new Faker();
-    String CountryID;
-    String CountryName;
-
+    String NationalityID;
+    String NationalityName;
     RequestSpecification reqSpec;
 
     @BeforeClass
     public void Login() {
         baseURI = "https://test.mersys.io";
-        Map<String, String> userCredential = new HashMap<>();
+        Map<String, Object> userCredential = new HashMap<>();
         userCredential.put("username", "turkeyts");
         userCredential.put("password", "TechnoStudy123");
         userCredential.put("rememberMe", "true");
@@ -32,7 +31,6 @@ public class CountryTest {
                 given()
                         .contentType(ContentType.JSON)
                         .body(userCredential)
-
                         .when()
                         .post("/auth/login")
 
@@ -47,102 +45,84 @@ public class CountryTest {
     }
 
     @Test
-    public void CreateCountry() {
+    public void AddNationalities() {
+        Map<String, String> Nationality = new HashMap<>();
+        NationalityName = faker.name().firstName() + faker.number().digits(3);
+        Nationality.put("name", NationalityName);
 
-
-        Map<String, String> country = new HashMap<>();
-        CountryName = faker.address().country() + faker.number().digits(5);
-        country.put("name", CountryName);
-        country.put("code", faker.address().countryCode() + faker.number().digits(5));
-
-
-        CountryID = given()
+        NationalityID = given()
                 .spec(reqSpec)
-                .body(country)
+                .body(Nationality)
                 .log().body()
-
                 .when()
-                .post("/school-service/api/countries")
-
+                .post("/school-service/api/nationality")
                 .then()
-                .log().body()
                 .statusCode(201)
                 .extract().path("id")
         ;
-        System.out.println("CountryID = " + CountryID);
+        System.out.println("NationalityID = " + NationalityID);
     }
-
-    @Test(dependsOnMethods = "CreateCountry")
-    public void CreateCountryNegative() {
-        Map<String, String> country = new HashMap<>();
-        country.put("name", CountryName);
-        country.put("code", faker.address().countryCode() + faker.number().digits(5));
-        given()
+    @Test(dependsOnMethods = "AddNationalities")
+    public void AddNationalitiesNegative(){
+        Map<String, String> Nationality = new HashMap<>();
+        Nationality.put("name", NationalityName);
+         given()
                 .spec(reqSpec)
-                .body(country)
+                .body(Nationality)
                 .log().body()
                 .when()
-                .post("/school-service/api/countries")
-
+                .post("/school-service/api/nationality")
                 .then()
-                .log().body()
                 .statusCode(400)
-                .body("message",containsString("already"))
         ;
-
 
     }
 
-    @Test(dependsOnMethods = "CreateCountryNegative")
-    public void UpdateCountry() {
+    @Test(dependsOnMethods ="AddNationalitiesNegative")
+    public void EditNationalities(){
 
-        Map<String,String> country=new HashMap<>();
-        country.put("id",CountryID);
-
-        CountryName="Alperen ülkesi"+faker.number().digits(7);
-        country.put("name",CountryName);
-        country.put("code",faker.address().countryCode()+faker.number().digits(5));
-
+        Map<String,String> Nationality=new HashMap<>();
+        Nationality.put("id",NationalityID);
+        NationalityName=faker.name().firstName()+faker.number().digits(3);
+        Nationality.put("name",NationalityName);
         given()
                 .spec(reqSpec)
-                .body(country) // giden body
-                //.log().body() // giden body yi log olarak göster
-
+                .body(Nationality)
                 .when()
-                .put("/school-service/api/countries")
-
+                .put("/school-service/api/nationality")
                 .then()
-                .log().body() // gelen body yi log olarak göster
+                .log().body()
                 .statusCode(200)
-                .body("name", equalTo(CountryName))
+                .body("name",equalTo(NationalityName))
         ;
-    }
 
-    @Test(dependsOnMethods = "UpdateCountry")
-    public void DeleteCountry() {
+    }
+    @Test(dependsOnMethods = "EditNationalities")
+    public void  DeleteNationalities(){
+
         given()
                 .spec(reqSpec)
-                .pathParam("CountryID",CountryID)
+                .pathParam("NationalityID",NationalityID)
+
                 .when()
-                .delete("/school-service/api/countries/{CountryID}")
+                .delete("/school-service/api/nationality/{NationalityID}")
+
                 .then()
                 .log().body()
                 .statusCode(200)
         ;
 
     }
-
-    @Test(dependsOnMethods = "DeleteCountry")
+    @Test(dependsOnMethods = "DeleteNationalities")
     public void DeleteCountryNegative() {
         given()
                 .spec(reqSpec)
-                .pathParam("CountryID",CountryID)
+                .pathParam("NationalityID",NationalityID)
                 .when()
-                .delete("/school-service/api/countries/{CountryID}")
+                .delete("/school-service/api/nationality/{NationalityID}")
                 .then()
                 .log().body()
                 .statusCode(400)
-                .body("message",equalTo("Country not found"))
         ;
 
     }
