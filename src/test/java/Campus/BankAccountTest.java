@@ -97,4 +97,28 @@ public class BankAccountTest {
                 .body("message",containsString("already"))
         ;
     }
+    @Test(dependsOnMethods = "AddBankAccountNegative")
+    public void EditBankAccount(){
+        Map<String,String> BankAccount=new HashMap<>();
+        BankAccountName=faker.funnyName().name()+faker.number().digits(3);
+        BankAccount.put("iban",IBAN);
+        BankAccount.put("name",BankAccountName);
+        BankAccount.put("id",BankAccountID);
+        BankAccount.put("schoolId",SchooldID);
+        BankAccount.put("currency","EUR");
+
+        given()
+                .spec(reqSpec)
+                .body(BankAccount)
+                .when()
+                .put("/school-service/api/bank-accounts")
+
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("name",equalTo(BankAccountName))
+
+        ;
+
+    }
 }
